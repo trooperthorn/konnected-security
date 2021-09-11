@@ -61,6 +61,8 @@ local _ = tmr.create():alarm(900, tmr.ALARM_AUTO, function(t)
     gpio.write(4, gpio.HIGH)
     enduser_setup.stop()
 
+  -- NTP Server settings 
+  --Query the gateway, google time, and ntp org.
     sntp.sync({gw, 'time.google.com', 'pool.ntp.org'},
       function(sec)
         tm = rtctime.epoch2cal(sec)
@@ -70,6 +72,7 @@ local _ = tmr.create():alarm(900, tmr.ALARM_AUTO, function(t)
         bootApp()
       end,
       function()
+ -- if NTP fails, it shows up here. I want this to over time go into a dormant/retry state instead of boot at every 5 minutes.
         print("Heap: ", node.heap(), "Time sync failed!")
         bootApp()
       end)
