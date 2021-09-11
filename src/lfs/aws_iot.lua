@@ -1,3 +1,6 @@
+-- THIS FILE MARKED FOR DELETION, SOME bad dev work here mister.
+
+
 local module = ...
 
 local mqtt = require('mqtt_ws')
@@ -47,6 +50,7 @@ heartbeat:register(200, tmr.ALARM_AUTO, function(t)
   hb.topic = topics.heartbeat
   hb.timestamp = rtctime.get()
   table.insert(sensorPut, hb)
+--QUE what?!? if i cannot connect to AWS, I die at 5 minutes? N00B!
   t:interval(300000) -- 5 minutes
 end)
 
