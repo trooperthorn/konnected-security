@@ -1,5 +1,5 @@
 -- THIS FILE MARKED FOR HEAVY MODIFICATION, SOME bad dev work here mister. YOU KNOW HOW MANY OPEN CASES REVOLVE AROUND LINES 54, 71-73
-
+-- clawback changes seen here https://github.com/konnected-io/konnected-security/commit/3ec892eeeb12f64ff04cd5bc44aa76c9c0078b36
 
 local module = ...
 
@@ -32,7 +32,8 @@ sendTimer:register(200, tmr.ALARM_AUTO, function(t)
 		if sensor.retry and sensor.retry > 10 then
 			print("Heap:", node.heap(), "Retried 10 times and failed. Rebooting in 30 seconds.")
 			for k, v in pairs(sensorPut) do sensorPut[k] = nil end -- remove all pending sensor updates
-			tmr.create():alarm(30000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 30 sec
+--RANDOM REBOOT WITHOUT 
+--			tmr.create():alarm(30000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 30 sec
 		else
 			local message_id = c.msg_id
       local topic = sensor.topic or topics.sensor
@@ -51,7 +52,7 @@ heartbeat:register(200, tmr.ALARM_AUTO, function(t)
   hb.timestamp = rtctime.get()
   table.insert(sensorPut, hb)
 --QUE what?!? if i cannot connect to AWS, I die at 5 minutes? N00B!
---  t:interval(300000) -- 5 minutes
+  t:interval(300000) -- 5 minutes
 end)
 
 --mqttTimeout:register(10000, tmr.ALARM_SEMI, function(t)
@@ -67,9 +68,10 @@ local function startLoop()
 		mqttFails = mqttFails + 1
 		print("Heap:", node.heap(), "mqtt: offline", "failures:", mqttFails)
 		sendTimer:stop()
--- change reboot from 10 to 32 integer max -4
-		if mqttFails >= 2147483640 then
-			--tmr.create():alarm(3000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 3 sec
+
+		if mqttFails >= 20 then
+			print("Heap:", node.heap(), 'LAST ACTION TO REBOOT, MQTT FAILS AWS IoT Endpoint')
+			tmr.create():alarm(3000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 3 sec
 		else
 			c:connect(settings.endpoint)
 		end
