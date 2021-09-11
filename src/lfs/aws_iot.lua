@@ -1,4 +1,4 @@
--- THIS FILE MARKED FOR DELETION, SOME bad dev work here mister.
+-- THIS FILE MARKED FOR HEAVY MODIFICATION, SOME bad dev work here mister. YOU KNOW HOW MANY OPEN CASES REVOLVE AROUND LINES 54, 71-73
 
 
 local module = ...
@@ -51,13 +51,13 @@ heartbeat:register(200, tmr.ALARM_AUTO, function(t)
   hb.timestamp = rtctime.get()
   table.insert(sensorPut, hb)
 --QUE what?!? if i cannot connect to AWS, I die at 5 minutes? N00B!
-  t:interval(300000) -- 5 minutes
+--  t:interval(300000) -- 5 minutes
 end)
 
-mqttTimeout:register(10000, tmr.ALARM_SEMI, function(t)
-	print("Heap:", node.heap(), 'Couldn\'t connect to AWS IoT! Restarting.')
-	node.restart()
-end)
+--mqttTimeout:register(10000, tmr.ALARM_SEMI, function(t)
+--	print("Heap:", node.heap(), 'Couldn\'t connect to AWS IoT! Restarting.')
+--	node.restart()
+--end)
 
 local function startLoop()
 	print("Heap:", node.heap(), 'Connecting to AWS IoT Endpoint:', settings.endpoint)
@@ -67,9 +67,9 @@ local function startLoop()
 		mqttFails = mqttFails + 1
 		print("Heap:", node.heap(), "mqtt: offline", "failures:", mqttFails)
 		sendTimer:stop()
-
-		if mqttFails >= 10 then
-			tmr.create():alarm(3000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 3 sec
+-- change reboot from 10 to 32 integer max -4
+		if mqttFails >= 2147483640 then
+			--tmr.create():alarm(3000, tmr.ALARM_SINGLE, function() node.restart() end) -- reboot in 3 sec
 		else
 			c:connect(settings.endpoint)
 		end
