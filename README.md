@@ -4,6 +4,34 @@
 
 # Konnected
 
+Issue: Firmware Source is written to fail when the rest of the network if offline.
+
+What happens: Konnected Reboots every 5 minutes if either of the following occur:
+
+NTP does not connect to hard coded internet URLs.
+failsafe: reboot after 5 minutes in case of extended wifi outage
+With the Current Configuration, this leads disable the entire Konnected Ecosystem under the following conditions:
+
+Loss of Internet Access (cannot resolve NTP to time.google.com or pool.ntp.org results to reboot)
+Loss of DNS (cannot resolve the NTP urls to IP, results in reboot)
+Deatuh attack on wifi. (cannot connect to Wifi, results in reboot)
+Power Outage (cannot connect to Network, DNS, NTP, resulting in reboot
+DHCP offline (calls DHCP every few minutes, even if the lease is set to 30 days or adjusted down to 7)
+File: konnected-security/src/lfs/wifi.lua
+
+Lines 15-18:
+-- failsafe: reboot after 5 minutes in case of extended wifi outage
+failsafeTimer = tmr.create()
+failsafeTimer:register(300000, tmr.ALARM_SINGLE, function() node.restart() end)
+
+Line 64:
+sntp.sync({gw, 'time.google.com', 'pool.ntp.org'},
+
+I block all NTP requests leaving the network to stop replay attacks. Once I created DNS records to point to my NTP Server, the connection stayed online.
+
+Also there is this AWS file that if it cannot connect to AWS it starts the reboot. This file is being modified 1st.
+
+
 **Konnected** integrates wired alarm system sensors and sirens to SmartThings, Home Assistant, OpenHAB, or Hubitat using a NodeMCU based ESP8266 development board and (optional) relay. This project consists of a few components:
  
  1. [NodeMCU](http://nodemcu.com/index_en.html) based firmware for an ESP8266 development board in `firmware`
