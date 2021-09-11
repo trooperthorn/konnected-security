@@ -6,7 +6,7 @@ local startWifiSetup = function()
   wifiFailTimer = nil
   enduser_setup.manual(false)
   enduser_setup.start()
-  failsafeTimer:start()
+  --failsafeTimer:start()
 end
 
 -- wait 30 seconds before entering wifi setup mode in case of a momentary outage
@@ -14,11 +14,11 @@ wifiFailTimer = tmr.create()
 wifiFailTimer:register(30000, tmr.ALARM_SINGLE, function() startWifiSetup() end)
 
 -- failsafe: reboot after 5 minutes in case of extended wifi outage
-failsafeTimer = tmr.create()
-failsafeTimer:register(300000, tmr.ALARM_SINGLE, function() node.restart() end)
+--failsafeTimer = tmr.create()
+--failsafeTimer:register(300000, tmr.ALARM_SINGLE, function() node.restart() end)
 
-wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED, function(T)
-  print("Heap: ", node.heap(), "Cannot connect to WiFi ", T.SSID, 'Reason Code:', T.reason)
+--wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED, function(T)
+  --print("Heap: ", node.heap(), "Cannot connect to WiFi ", T.SSID, 'Reason Code:', T.reason)
 
   if T.reason == wifi.eventmon.reason.AUTH_EXPIRE then
     -- wifi password is incorrect, immediatly enter setup mode
